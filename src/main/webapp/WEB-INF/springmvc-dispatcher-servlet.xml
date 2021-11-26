@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<context:component-scan
+		base-package="com.Day12.controller" />
+
+
+	<tx:annotation-driven
+        transaction-manager="hibernateTransactionManager" />
+
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix">
+			<value>/WEB-INF/views/</value>
+		</property>
+		<property name="suffix">
+			<value>.jsp</value>
+		</property>
+	</bean>
+	
+	<!-- better use <context:property-placeholder/> and use the database.properties file-->
+	
+	<!-- <context:property-placeholder/> -->
+	
+	<bean
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        id="dataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/demodb_day12?serverTimezone=Europe/Rome"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="dunpeal87$$"></property>
+    </bean>
+    
+    
+   <!-- for the LocalSessionFactoryBean to work, we need to add a listener to web.xml -->
+    <bean
+        class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+        id="sessionFactory">
+        <property name="dataSource" ref="dataSource"></property> <!-- inject database config -->
+        <property name="annotatedClasses">
+            <list>
+                <value>com.Day12.models.Employee</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">create</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean
+        class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+        id="hibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"></property> <!-- inject LocalSessionFactoryBean -->
+    </bean>
+	
+	<mvc:annotation-driven />
+
+</beans>
